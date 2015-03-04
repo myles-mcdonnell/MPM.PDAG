@@ -1,15 +1,20 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0138C3AD-5528-4EAB-B8F7-AD09A6539A3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPM.PDAG.UnitTests", "MPM.PDAG.UnitTests\MPM.PDAG.UnitTests.csproj", "{1AA94937-25F5-496C-876C-D5F780255F2C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPM.PDAG", "MPM.PDAG\MPM.PDAG.csproj", "{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}"
 EndProject
-Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "MPM.PDAG.Documentation", "MPM.PDAG.Documentation\MPM.PDAG.Documentation.shfbproj", "{C0FA3348-9D4A-4710-BAD1-1EE838108666}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{6F4E6576-3E02-4C0E-A596-AF38552B2E3E}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPM.PDAG.Example", "MPM.PDAG.Example\MPM.PDAG.Example.csproj", "{38FBFC49-BA17-49F8-8857-67E476A35514}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,16 +30,16 @@ Global
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0FA3348-9D4A-4710-BAD1-1EE838108666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0FA3348-9D4A-4710-BAD1-1EE838108666}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0FA3348-9D4A-4710-BAD1-1EE838108666}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1AA94937-25F5-496C-876C-D5F780255F2C} = {0138C3AD-5528-4EAB-B8F7-AD09A6539A3A}
-		{C0FA3348-9D4A-4710-BAD1-1EE838108666} = {6F4E6576-3E02-4C0E-A596-AF38552B2E3E}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = PDAG\PDAG.csproj
