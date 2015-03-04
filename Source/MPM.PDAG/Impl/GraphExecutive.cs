@@ -33,7 +33,7 @@ namespace MPM.PDAG
         public event EventHandler OnPausePending;
         public event EventHandler OnCancelled;
         public event EventHandler OnCancelPending;
-        public event EventHandler<VertexProgressEventArgs> OnVertexProgress;
+      //  public event EventHandler<VertexProgressEventArgs> OnVertexProgress;
 
         private readonly IDirectedAcyclicGraph _graph;
         private readonly IConcurrencyThrottle _throttle;

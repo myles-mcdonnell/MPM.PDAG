@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace MPM.PDAG.UnitTests
 {
@@ -8,121 +10,43 @@ namespace MPM.PDAG.UnitTests
     public class DirectedAcyclicGraphTests
     {
         [Test]
-        public void AllVertices()
+        public void SimpleGraphAggregates()
         {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
+			var node0 = new Vertex (() => Thread.Sleep(1));
+			var node1 = new Vertex (() => Thread.Sleep(1));
+			var node2 = new Vertex (() => Thread.Sleep(1));
 
-            vertex00Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex01Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex01Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] {vertex00Mock.Object, vertex01Mock.Object});
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex10Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-            vertex11Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
+			node2.AddDependencies (node1);
+			node1.AddDependencies (node0);
 
-            var vertices = new DirectedAcyclicGraph(vertex00Mock.Object, vertex01Mock.Object).AllVertices.ToList();
+			var graph = new DirectedAcyclicGraph (node0, node1, node2);
 
-            Assert.AreEqual(4, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex00Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex01Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex10Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex11Mock.Object));
+            Assert.AreEqual(3, graph.AllVertices.Count());
+			Assert.AreEqual(1, graph.RootVertices.Count());
+			Assert.AreEqual(1, graph.TerminalVertices.Count());
+
+			Assert.AreEqual (node0, graph.RootVertices.First ());
+			Assert.AreEqual (node2, graph.TerminalVertices.First ());
+
         }
+			
+		[Test]
+		public void SimpleGraphExecuteSequentially()
+		{
+			var stack = new Stack<int> ();
 
-        [Test]
-        public void RootVertices0()
-        {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
+			var node0 = new Vertex (() => stack.Push (1));
+			var node1 = new Vertex (() => stack.Push (2));
+			var node2 = new Vertex (() => stack.Push (3));
 
-            vertex00Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex01Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex01Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex10Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-            vertex11Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
+			node2.AddDependencies (node1);
+			node1.AddDependencies (node0);
 
-            var vertices = new DirectedAcyclicGraph(vertex00Mock.Object, vertex01Mock.Object).RootVertices.ToList();
+			new DirectedAcyclicGraph (node0, node1, node2).ExecuteSequentially ();
 
-            Assert.AreEqual(2, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex00Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex01Mock.Object));
-        }
-
-        [Test]
-        public void RootVertices1()
-        {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
-
-            vertex00Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object});
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object });
-            vertex10Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-            vertex11Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-
-            var vertices = new DirectedAcyclicGraph(vertex00Mock.Object, vertex10Mock.Object).RootVertices.ToList();
-
-            Assert.AreEqual(1, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex00Mock.Object));
-        }
-
-        [Test]
-        public void RootVertices2()
-        {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
-
-            vertex00Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex01Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex01Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex10Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-            vertex11Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-
-            var vertices = new DirectedAcyclicGraph(vertex10Mock.Object, vertex11Mock.Object).RootVertices.ToList();
-
-            Assert.AreEqual(2, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex10Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex11Mock.Object));
-        }
-
-        [Test]
-        public void TerminalVertices()
-        {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
-
-            vertex00Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex01Mock.Setup(v => v.Dependencies).Returns(new IVertex[0]);
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex01Mock.Setup(v => v.Dependents).Returns(new[] { vertex10Mock.Object, vertex11Mock.Object });
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex10Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-            vertex11Mock.Setup(v => v.Dependents).Returns(new IVertex[0]);
-
-            var vertices = new DirectedAcyclicGraph(vertex00Mock.Object, vertex01Mock.Object).TerminalVertices.ToList();
-
-            Assert.AreEqual(2, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex10Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex11Mock.Object));
-        }
+			for (int i = 3; i > 0; i--) {
+				Assert.AreEqual (i, stack.Pop ());
+			}
+		}
     }
 }

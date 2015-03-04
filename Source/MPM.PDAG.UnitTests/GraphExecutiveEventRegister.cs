@@ -30,7 +30,7 @@
             graphExecutive.OnResumed += (sender, e) => ExecutiveResumedEventCount.Increment();
             graphExecutive.OnPaused += (sender, e) => ExecutivePausedEventCount.Increment();
             graphExecutive.OnCancelled += (sender, e) => ExecutiveCancelledEventCount.Increment();
-            graphExecutive.OnVertexProgress += (sender, e) => VertexProgressEventCount.Increment();
+         //   graphExecutive.OnVertexProgress += (sender, e) => VertexProgressEventCount.Increment();
             graphExecutive.OnPausePending += (sender, e) => ExecutivePausePendingEventCount.Increment();
             graphExecutive.OnCancelPending += (sender, e) => ExecutiveCancelPendingEventCount.Increment();
             graphExecutive.OnResumePending += (sender, e) => ExecutiveResumePendingEventCount.Increment();

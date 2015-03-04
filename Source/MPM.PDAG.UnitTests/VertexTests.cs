@@ -12,14 +12,10 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-#region Using
 
-using System;
 using System.Threading;
-using Moq;
+using System.Linq;
 using NUnit.Framework;
-
-#endregion
 
 namespace MPM.PDAG.UnitTests
 {
@@ -30,20 +26,20 @@ namespace MPM.PDAG.UnitTests
         [ExpectedException(typeof (CircularDependencyException))]
         public void CircularDependencyTest()
         {
-            var node = new Vertex();
+			var node = new Vertex(()=>Thread.Sleep(1));
 
             node.AddDependencies(node);
         }
 
         [Test]
         [ExpectedException(typeof (CircularDependencyException))]
-        public void NestedCircurlarDependencyTest()
+        public void NestedCircularDependencyTest()
         {
-            var node = new Vertex();
+			var node = new Vertex(()=>Thread.Sleep(1));
 
-            var node2 = new Vertex();
-            var node3 = new Vertex();
-            var node4 = new Vertex();
+			var node2 = new Vertex(()=>Thread.Sleep(1));
+			var node3 = new Vertex(()=>Thread.Sleep(1));
+			var node4 = new Vertex(()=>Thread.Sleep(1));
 
             node2.AddDependencies(node);
             node3.AddDependencies(node2);
@@ -52,83 +48,45 @@ namespace MPM.PDAG.UnitTests
             node.AddDependencies(node2);
         }
 
-        [Test]
-        public void ExecuteSingleVertexSuccess()
-        {
-            var vertex = new Vertex();
+		[Test]
+		public void RemoveRedundantDependencies()
+		{
+			var node = new Vertex(()=>Thread.Sleep(1));
 
-            var vertexRegister = new VertexEventRegister(vertex);
+			var node2 = new Vertex(()=>Thread.Sleep(1));
+			var node3 = new Vertex(()=>Thread.Sleep(1));
 
-            var graphExecutiveMock = new Mock<IGraphExecutive>();
-            graphExecutiveMock.Setup(g => g.CanVertexExecutionProceed()).Returns(true);
+			node3.AddDependencies (node2, node);
 
-            Assert.AreEqual(ExecutionResult.None, vertex.LastExecutionResult);
-            vertex.Execute(graphExecutiveMock.Object);
+			Assert.AreEqual (2, node3.Dependencies.Count());
 
-            vertexRegister.Completed.Wait(1, TimeSpan.FromSeconds(3));
+			node3.RemoveRedundantDependencies ();
 
-            Assert.AreEqual(ExecutionResult.Success, vertex.LastExecutionResult);
-            Assert.AreEqual(0, vertexRegister.Cancelled);
-            Assert.AreEqual(0, vertexRegister.Failed);
-            Assert.AreEqual(1, vertexRegister.Completed);
-            Assert.AreEqual(1, vertexRegister.Started);
-        }
+			Assert.AreEqual (2, node3.Dependencies.Count());
 
-        [Test]
-        public void ExecuteSingleVertexFailure()
-        {
-            var vertex = new Vertex(state => { throw new Exception(); });
+			node2.AddDependencies (node);
 
-            var vertexRegister = new VertexEventRegister(vertex);
+			node3.RemoveRedundantDependencies ();
 
-            var graphExecutiveMock = new Mock<IGraphExecutive>();
-            graphExecutiveMock.Setup(g => g.CanVertexExecutionProceed()).Returns(true);
+			Assert.AreEqual (1, node3.Dependencies.Count());
+		}
 
-            Assert.AreEqual(ExecutionResult.None, vertex.LastExecutionResult);
-            vertex.Execute(graphExecutiveMock.Object);
+		[Test]
+		public void DoNotAddRedundantDependency()
+		{
+			var node = new Vertex(()=>Thread.Sleep(1));
 
-            vertexRegister.Failed.Wait(1,TimeSpan.FromSeconds(3));
-            Assert.AreEqual(ExecutionResult.Fail, vertex.LastExecutionResult);
-            Assert.AreEqual(0, vertexRegister.Cancelled);
-            Assert.AreEqual(1, vertexRegister.Failed);
-            Assert.AreEqual(0, vertexRegister.Completed);
-            Assert.AreEqual(1, vertexRegister.Started);
-        }
+			var node2 = new Vertex(()=>Thread.Sleep(1));
+			var node3 = new Vertex(()=>Thread.Sleep(1));
 
-        [Test]
-        public void ExecuteSingleVertexCancel()
-        {
-            var vertex = new Vertex(state =>
-                                        {
-                                            var started = DateTime.Now;
-                                            while (!state.CancellationToken.IsCancellationRequested)
-                                            {
-                                                Thread.Sleep(100);
+			node2.AddDependencies (node);
+			node3.AddDependencies (node2);
 
-                                                if (DateTime.Now-started>TimeSpan.FromSeconds(5))
-                                                    throw new TimeoutException();
-                                            }
+			Assert.AreEqual (1, node3.Dependencies.Count());
 
-                                            state.CancellationToken.ThrowIfCancellationRequested();
-                                        });
+			node3.AddDependencies (node);
 
-            var vertexRegister = new VertexEventRegister(vertex);
-
-            vertex.OnStarted += delegate { vertex.Cancel(); };
-
-            var graphExecutiveMock = new Mock<IGraphExecutive>();
-            graphExecutiveMock.Setup(g => g.CanVertexExecutionProceed()).Returns(true);
-
-            Assert.AreEqual(ExecutionResult.None, vertex.LastExecutionResult);
-            vertex.Execute(graphExecutiveMock.Object);
-
-            vertexRegister.Cancelled.Wait(1, TimeSpan.FromSeconds(3));
-
-            Assert.AreEqual(ExecutionResult.Cancel, vertex.LastExecutionResult);
-            Assert.AreEqual(1, vertexRegister.Cancelled);
-            Assert.AreEqual(0, vertexRegister.Failed);
-            Assert.AreEqual(0, vertexRegister.Completed);
-            Assert.AreEqual(1, vertexRegister.Started);
-        }
+			Assert.AreEqual (1, node3.Dependencies.Count());
+		}
     }
 }

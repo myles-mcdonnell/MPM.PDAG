@@ -25,14 +25,14 @@ namespace MPM.PDAG
     /// </summary>
     public class CircularDependencyException : Exception
     {
-        private readonly IVertex _vertex;
+        private readonly Vertex _vertex;
 
-        public CircularDependencyException(IVertex vertex)
+        public CircularDependencyException(Vertex vertex)
         {
             _vertex = vertex;
         }
 
-        public IVertex Vertex
+        public Vertex Vertex
         {
             get { return _vertex; }
         }

@@ -28,24 +28,21 @@ namespace MPM.PDAG
         
         private readonly IDirectedAcyclicGraph _directedAcyclicGraph;
         //private readonly IDirectedAcyclicGraphFactory _directedAcyclicGraphFactory;
-        private readonly IGraphExecutiveFactory _graphExecutiveFactory;
+        //private readonly IGraphExecutiveFactory _graphExecutiveFactory;
         private readonly IDictionary<IVertex, DateTime> _pendingReExecution = new Dictionary<IVertex, DateTime>();
         private readonly object _lock = new object();
         private readonly Timer _timer = new Timer(1000);
 
-        public GraphExecutionCoordinator(IDirectedAcyclicGraph directedAcyclicGraph, 
-            IGraphExecutiveFactory graphExecutiveFactory = null)
+		public GraphExecutionCoordinator(IDirectedAcyclicGraph directedAcyclicGraph)//, 
+           // IGraphExecutiveFactory graphExecutiveFactory = null)
         {
             AutoExecutionDelay = TimeSpan.MinValue;
             _directedAcyclicGraph = directedAcyclicGraph;
             //_directedAcyclicGraphFactory = directedAcyclicGraphFactory??new DirectedAcyclicGraphFactory();
-            _graphExecutiveFactory = graphExecutiveFactory??new GraphExecutiveFactory();
+           // _graphExecutiveFactory = graphExecutiveFactory??new GraphExecutiveFactory();
 
             _timer.Elapsed += _timer_Elapsed;
-
-            foreach (var vertex in _directedAcyclicGraph.AllVertices)
-                vertex.OnRequiresReExecution += vertex_OnRequiresReExecution;
-        }
+		}
 
         void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -93,12 +90,7 @@ namespace MPM.PDAG
 
         private void ExecuteGraph(IDirectedAcyclicGraph graph)
         {
-            var graphExecutive = _graphExecutiveFactory.Build(graph);
-
-            graphExecutive.Run();
-
-            if (OnGraphExecutiveStarted!=null)
-                OnGraphExecutiveStarted(this, new EventArgs<IGraphExecutive>(graphExecutive));
+           
         }
     }
 }

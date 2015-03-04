@@ -77,7 +77,7 @@ namespace MPM.PDAG
         /// <summary>
         /// Raised each time am <see cref="IVertex"/> repors progress
         /// </summary>
-        event EventHandler<VertexProgressEventArgs> OnVertexProgress;
+        //event EventHandler<VertexProgressEventArgs> OnVertexProgress;
 
         /// <summary>
         /// Starts <see cref="IDirectedAcyclicGraph"/> asynchronously
@@ -112,7 +112,7 @@ namespace MPM.PDAG
         /// <summary>
         /// The result of the last execution 
         /// </summary>
-        ExecutionResult LastExecutionResult { get; }
+        
 
         /// <summary>
         /// Returns true if graph execution is running, false if cancelled or waits if paused/throttled

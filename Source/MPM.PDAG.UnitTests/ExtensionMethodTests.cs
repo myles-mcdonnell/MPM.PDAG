@@ -1,56 +1,51 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using System.Threading;
 
 namespace MPM.PDAG.UnitTests
 {
     [TestFixture]
     public class ExtensionMethodTests
     {
-        [Test]
+       [Test]
         public void FlattenAndGetDistinctDownwards()
         {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
+			var vertex00 = new Vertex(()=>Thread.Sleep(1));
+			var vertex01 = new Vertex(()=>Thread.Sleep(1));
+			var vertex10 = new Vertex(()=>Thread.Sleep(1));
+			var vertex11 = new Vertex(()=>Thread.Sleep(1));
 
-            vertex00Mock.Setup(v => v.Dependents).Returns(new[] {vertex10Mock.Object, vertex11Mock.Object});
-            vertex01Mock.Setup(v => v.Dependents).Returns(new[] {vertex10Mock.Object, vertex11Mock.Object});
+			vertex00.AddDependencies (vertex10, vertex11);
+			vertex01.AddDependencies (vertex10, vertex11);
 
-            var vertices = new[] {vertex00Mock.Object, vertex01Mock.Object}.FlattenAndGetDistinct();
+			var vertices = new[] {vertex10, vertex11}.FlattenAndGetDistinct();
 
             Assert.AreEqual(4, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex00Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex01Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex10Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex11Mock.Object));
-
-            vertex00Mock.VerifyAll();
-            vertex01Mock.VerifyAll();
+            Assert.IsTrue(vertices.Contains(vertex00));
+            Assert.IsTrue(vertices.Contains(vertex01));
+            Assert.IsTrue(vertices.Contains(vertex10));
+            Assert.IsTrue(vertices.Contains(vertex11));
         }
 
         [Test]
         public void FlattenAndGetDistinctUpwards()
         {
-            var vertex00Mock = new Mock<IVertex>();
-            var vertex01Mock = new Mock<IVertex>();
-            var vertex10Mock = new Mock<IVertex>();
-            var vertex11Mock = new Mock<IVertex>();
+			var vertex00 = new Vertex(()=>Thread.Sleep(1));
+			var vertex01 = new Vertex(()=>Thread.Sleep(1));
+			var vertex10 = new Vertex(()=>Thread.Sleep(1));
+			var vertex11 = new Vertex(()=>Thread.Sleep(1));
 
-            vertex10Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
-            vertex11Mock.Setup(v => v.Dependencies).Returns(new[] { vertex00Mock.Object, vertex01Mock.Object });
+            vertex10.AddDependencies(vertex00, vertex01);
+            vertex11.AddDependencies(vertex00, vertex01);
 
-            var vertices = new[] { vertex10Mock.Object, vertex11Mock.Object }.FlattenAndGetDistinct(true);
+            var vertices = new[] { vertex10, vertex11 }.FlattenAndGetDistinct(true);
 
             Assert.AreEqual(4, vertices.Count());
-            Assert.IsTrue(vertices.Contains(vertex00Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex01Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex10Mock.Object));
-            Assert.IsTrue(vertices.Contains(vertex11Mock.Object));
-
-            vertex00Mock.VerifyAll();
-            vertex01Mock.VerifyAll();
-        }
+            Assert.IsTrue(vertices.Contains(vertex00));
+            Assert.IsTrue(vertices.Contains(vertex01));
+            Assert.IsTrue(vertices.Contains(vertex10));
+            Assert.IsTrue(vertices.Contains(vertex11));
+         }
     }
 }

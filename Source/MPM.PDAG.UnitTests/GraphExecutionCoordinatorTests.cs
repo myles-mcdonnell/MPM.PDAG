@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using Moq;
 using NUnit.Framework;
 
@@ -58,7 +57,7 @@ namespace MPM.PDAG.UnitTests
 
             var eventRegister = new GraphCoordinatorEventRegister(coordinator);
 
-            vertex.Raise(v => v.OnRequiresReExecution += null, new EventArgs<IVertex>(vertex.Object));
+            //vertex.Raise(v => v.OnRequiresReExecution += null, new EventArgs<IVertex>(vertex.Object));
 
             eventRegister.GraphExecutiveStarted.Wait(1, TimeSpan.FromSeconds(2));
         }

@@ -32,17 +32,13 @@ namespace MPM.PDAG
         event EventHandler<EventArgs<IVertex>> OnCompleted;
         event EventHandler<EventArgs<Tuple<IVertex, Exception>>> OnFailed;
         event EventHandler<VertexProgressEventArgs> OnProgress;
-        event EventHandler<EventArgs<IVertex>> OnRequiresReExecution;
 
         IEnumerable<IVertex> Dependencies { get; }
         IEnumerable<IVertex> Dependents { get; }
 
         object Tag { get; set; }
         string Name { get; set; }
-        bool Enabled { get; set; }
-        
-        VertexState State { get; }
-        ExecutionResult LastExecutionResult { get; }
+		bool Enabled { get; set; }
 
         void Execute(IGraphExecutive graphExecutive);
         void Cancel();

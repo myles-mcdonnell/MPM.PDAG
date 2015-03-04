@@ -9,7 +9,7 @@ namespace MPM.PDAG.Example
         static void Main(string[] args)
         {
             //Create six node that each do nothing for at least 1 second
-            var nodeA = new Vertex(ctx => Thread.Sleep(1000));
+            /*var nodeA = new Vertex(ctx => Thread.Sleep(1000));
             var nodeB = new Vertex(ctx => Thread.Sleep(1000));
             var nodeC = new Vertex(ctx => Thread.Sleep(1000));
             var nodeD = new Vertex(ctx => Thread.Sleep(1000));
@@ -43,7 +43,7 @@ namespace MPM.PDAG.Example
             resetEvent.Wait();
 
             //Output result
-            Console.WriteLine(ex != null ? ex.Message : "Graph Execution Complete");
+            Console.WriteLine(ex != null ? ex.Message : "Graph Execution Complete");*/
 
 #if DEBUG
             Console.ReadLine();
