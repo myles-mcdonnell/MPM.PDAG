@@ -41,23 +41,5 @@ namespace MPM.PDAG
         public IEnumerable<Vertex> AllVertices { get; private set; }
         public IEnumerable<Vertex> RootVertices { get; private set; }
         public IEnumerable<Vertex> TerminalVertices { get; private set; }
-
-		public void ExecuteSequentially()
-		{
-			var verticesComplete = new List<Vertex>();
-			var allVertices = AllVertices.ToList();
-			var pendingVertices = RootVertices.ToList();
-
-			do{
-				foreach(var vertex in pendingVertices.ToList()){
-					vertex.Execute();
-					allVertices.Remove(vertex);
-					verticesComplete.Add(vertex);
-				}
-
-				pendingVertices = allVertices.Where(v=>v.Dependencies.All(d=>verticesComplete.Contains(d))).ToList();
-			}
-			while(pendingVertices.Count()>0);
-		}
     }
 }

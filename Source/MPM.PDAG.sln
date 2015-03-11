@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0138C3AD-5528-4EAB-B8F7-AD09A6539A3A}"
@@ -26,19 +26,23 @@ Global
 		{1AA94937-25F5-496C-876C-D5F780255F2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AA94937-25F5-496C-876C-D5F780255F2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AA94937-25F5-496C-876C-D5F780255F2C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38FBFC49-BA17-49F8-8857-67E476A35514}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1AA94937-25F5-496C-876C-D5F780255F2C} = {0138C3AD-5528-4EAB-B8F7-AD09A6539A3A}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = PDAG\PDAG.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
@@ -50,8 +54,5 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

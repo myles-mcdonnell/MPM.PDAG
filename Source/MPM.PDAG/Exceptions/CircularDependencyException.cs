@@ -1,4 +1,5 @@
-﻿//   Copyright 2012 Myles McDonnell (myles.mcdonnell.public@gmail.com)
+﻿#region HEADER
+//   Copyright 2015 Myles McDonnell (mcdonnell.myles@gmail.com)
 
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
+#endregion
 
 #region Using
 
@@ -18,7 +20,7 @@ using System;
 
 #endregion
 
-namespace MPM.PDAG
+namespace MPM.PDAG.Exceptions
 {
     /// <summary>
     ///   Thrown if the current operation would result in a circular node dependency

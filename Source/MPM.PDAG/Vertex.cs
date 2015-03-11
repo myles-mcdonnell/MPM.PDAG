@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using MPM.PDAG.Exceptions;
 
 #endregion
 
@@ -38,7 +38,7 @@ namespace MPM.PDAG
             _doWorkAction = doWorkAction;
         }
 
-		//TODO : Head recursive!
+		//TODO : MPM : Head recursive?!
         public bool IsDependency(Vertex vertex)
         {
             return Dependencies.Any(d => d == vertex) || (Dependencies.Any(dependency => dependency.IsDependency(vertex)));
@@ -87,14 +87,9 @@ namespace MPM.PDAG
 
         public void RemoveRedundantDependencies()
 		{
-			var redundants = new List<Vertex> ();
+			var redundants = Dependencies.Where(dependency => Dependencies.FirstOrDefault(d => d != dependency && d.IsDependency(dependency)) != null).ToList();
 
-			foreach (var dependency in Dependencies) {
-				if (Dependencies.FirstOrDefault(d=>d!=dependency && d.IsDependency(dependency))!=null)
-					redundants.Add(dependency);
-			}
-
-			foreach (var redundancy in redundants)
+            foreach (var redundancy in redundants)
 				_dependencies.Remove (redundancy);
 
 			foreach (var dependent in Dependencies)
@@ -114,7 +109,7 @@ namespace MPM.PDAG
 			
         public void Execute()
         {
-			_doWorkAction ();
+			_doWorkAction();
         }
     }
 }

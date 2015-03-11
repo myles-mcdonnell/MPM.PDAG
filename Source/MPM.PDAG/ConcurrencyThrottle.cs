@@ -19,20 +19,20 @@ using System.Threading;
 
 namespace MPM.PDAG
 {
-    public class ConcurrencyThrottle : IConcurrencyThrottle
+    public class ConcurrencyThrottle 
     {
         public bool Enabled { get; set; }
-        public int MaxValue { get; set; }
+        public int MaxValue { get; private set; }
         public int CurrentValue { get; private set; }
         
         private readonly object _lock = new object();
 
-        public ConcurrencyThrottle()
+        public ConcurrencyThrottle(int maxValue = 0)
         {
-            MaxValue = Environment.ProcessorCount;
+            MaxValue = maxValue < 1 ? Environment.ProcessorCount : maxValue;
         }
 
-        public void Exit()
+        public virtual void Exit()
         {
             lock(_lock)
             {
@@ -42,7 +42,7 @@ namespace MPM.PDAG
             }
         }
 
-        public void Enter()
+        public virtual void Enter()
         {
             lock(_lock)
             {
@@ -54,5 +54,12 @@ namespace MPM.PDAG
                 MaxValue = Math.Max(++CurrentValue, MaxValue);
             }
         }
+    }
+
+    internal class NullConcurrencyThrottle : ConcurrencyThrottle
+    {
+        public override void Enter(){}
+
+        public override void Exit() { }
     }
 }

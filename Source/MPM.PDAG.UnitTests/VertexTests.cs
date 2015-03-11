@@ -15,6 +15,7 @@
 
 using System.Threading;
 using System.Linq;
+using MPM.PDAG.Exceptions;
 using NUnit.Framework;
 
 namespace MPM.PDAG.UnitTests
