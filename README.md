@@ -14,40 +14,27 @@ be provided when executing a graph.  What action is performed when a vertex is e
 Although this code has been kicking around in my tool box for a few years only the simple use cases are complete.  There is work to be done around graph execution cancellation and a few other features, PR's are more than welcome.
 
 <pre>
-    //Create six node that each do nothing for at least 1 second
-    var nodeA = new Vertex(ctx => Thread.Sleep(1000));
-    var nodeB = new Vertex(ctx => Thread.Sleep(1000));
-    var nodeC = new Vertex(ctx => Thread.Sleep(1000));
-    var nodeD = new Vertex(ctx => Thread.Sleep(1000));
-    var nodeE = new Vertex(ctx => Thread.Sleep(1000));
-    var nodeF = new Vertex(ctx => Thread.Sleep(1000));
+//Create six node that each do nothing for at least 1 second
+var nodeA = new Vertex(() => Thread.Sleep(1000));
+var nodeB = new Vertex(() => Thread.Sleep(1000));
+var nodeC = new Vertex(() => Thread.Sleep(1000));
+var nodeD = new Vertex(() => Thread.Sleep(1000));
+var nodeE = new Vertex(() => Thread.Sleep(1000));
+var nodeF = new Vertex(() => Thread.Sleep(1000));
 
-    //Create a DAG from the nodes
-    nodeC.AddDependencies(nodeA, nodeB);
-    nodeD.AddDependencies(nodeC);
-    nodeE.AddDependencies(nodeC);
-    nodeF.AddDependencies(nodeB);
-    var graph = new DirectedAcyclicGraph(nodeA, nodeB, nodeC, nodeD, nodeE, nodeF);
+//Create a DAG from the nodes
+nodeC.AddDependencies(nodeA, nodeB);
+nodeD.AddDependencies(nodeC);
+nodeE.AddDependencies(nodeC);
+nodeF.AddDependencies(nodeB);
+var graph = new DirectedAcyclicGraph(nodeA, nodeB, nodeC, nodeD, nodeE, nodeF);
 
-    //Create a graph execution co-ordinator
-    var graphExecutive = new GraphExecutive(graph);
+//Create a graph executive
+var graphExecutive = new ConcurrentGraphExecutive(graph, new ConcurrencyThrottle(8), ConcurrencyThrottleStrategy.PreThreadQueue);
 
-    //set up reset event so we can have this thread wait for the graph execution to complete
-    var resetEvent = new ManualResetEventSlim();
-    Exception ex = null;
-    graphExecutive.OnFailed += (sender, eargs) =>
-    {
-        resetEvent.Set();
-        ex = eargs.Argument.Item2;
-    };
-    graphExecutive.OnFinished += (sender, eargs) => resetEvent.Set();
-
-    //Execute the graph
-    graphExecutive.Run();
-
-    //Wait for execution to finish
-    resetEvent.Wait();
-
-    //Output result
-    Console.WriteLine(ex != null ? ex.Message : "Graph Execution Complete");
+graphExecutive.ExecuteAndWait();
+            
+//Output result
+Console.WriteLine("Graph Execution Complete");
+Console.WriteLine(graphExecutive.VerticesFailed.Any() ? "\tn nodes failed" : "\tall nodes successful");
 </pre>
