@@ -19,9 +19,11 @@ using System.Threading;
 
 namespace MPM.PDAG
 {
+    /// <summary>
+    /// Used to limit the number of vertices executed concurrently by <see cref="ConcurrentGraphExecutive"/>. Defaults to number of processors on host.
+    /// </summary>
     public class ConcurrencyThrottle 
     {
-        public bool Enabled { get; set; }
         public int MaxValue { get; private set; }
         public int CurrentValue { get; private set; }
         
@@ -46,7 +48,7 @@ namespace MPM.PDAG
         {
             lock(_lock)
             {
-                while (Enabled && CurrentValue >= MaxValue)
+                while (CurrentValue >= MaxValue)
                 {
                     Monitor.Wait(_lock);
                 }

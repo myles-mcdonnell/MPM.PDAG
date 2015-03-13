@@ -14,8 +14,6 @@
 //   limitations under the License.
 #endregion
 
-
-
 #region Using
 
 using System.Reflection;
@@ -59,5 +57,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("2.0.0.*")]
 //[assembly: InternalsVisibleTo("MPM.PDAG.UnitTests", AllInternalsVisible = true)]

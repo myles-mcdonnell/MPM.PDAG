@@ -43,6 +43,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MPM.PDAG\MPM.PDAG.csproj">
+      <Project>{AAF234C6-6D1B-4E53-B868-6C7D06A2703F}</Project>
+      <Name>MPM.PDAG</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
