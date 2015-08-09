@@ -37,18 +37,11 @@ namespace MPM.PDAG
         {
             _doWorkAction = doWorkAction;
         }
-
-		//TODO : MPM : Head recursive?!
         public bool IsDependency(Vertex vertex)
         {
             return Dependencies.Any(d => d == vertex) || (Dependencies.Any(dependency => dependency.IsDependency(vertex)));
         }
-
-        public bool IsDependent(Vertex vertex)
-        {
-            return Dependents.Any(d => d == vertex) || (Dependents.Any(dependent => dependent.IsDependency(vertex)));
-        }
-
+    
         public IEnumerable<Vertex> Dependencies
         {
             get { return _dependencies; }
@@ -65,7 +58,7 @@ namespace MPM.PDAG
 
 					CheckForCircularDependency(dependency.Dependencies);
 
-					if (_dependencies.Any(n => n == dependency || n.IsDependency(dependency)))
+					if (_dependencies.IsDependency(dependency))
 						return this;
 
 					_dependencies.Add(dependency);

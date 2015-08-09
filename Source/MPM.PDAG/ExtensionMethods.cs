@@ -18,6 +18,7 @@ using System.Linq;
 #endregion
 
 using System.Collections.Generic;
+using System.Net;
 
 namespace MPM.PDAG
 {
@@ -41,6 +42,11 @@ namespace MPM.PDAG
                         stack.Push(child);
                 }
             }
+        }
+
+        public static bool IsDependency(this IEnumerable<Vertex> vertices, Vertex vertex)
+        {
+            return vertices.Any(d => d == vertex) || (vertices.Any(dependency => dependency.IsDependency(vertex)));
         }
     }
 }
