@@ -24,13 +24,13 @@ namespace MPM.PDAG
     /// <summary>
     /// Executes a graph concurrently.
     /// </summary>
-    public class ConcurrentGraphExecutive : IGraphExecutive
+    public class GraphExecutive 
     {
-        private readonly object _executionLock = new Object();
         private readonly DirectedAcyclicGraph _graph;
-        private readonly IConcurrencyThottleStrategy _throttle;
+        private readonly ConcurrencyThrottle _throttle;
         private readonly object _scheduleLock = new object();
         private List<Vertex> _verticesComplete;
+        private List<Vertex> _verticesScheduled;
         private int _verticesProcessed, _allVerticesCount;
 
         public IDictionary<Vertex, Exception> VerticesFailed { get; private set; }
@@ -41,11 +41,10 @@ namespace MPM.PDAG
         /// </summary>
         /// <param name="graph">The graph to execute</param>
         /// <param name="throttle">optional concurrency throttle</param>
-        /// <param name="concurrencyThrottleStrategy">optional ConcurrencyThrottleStrategy</param>
-        public ConcurrentGraphExecutive(DirectedAcyclicGraph graph, ConcurrencyThrottle throttle = null, ConcurrencyThrottleStrategy concurrencyThrottleStrategy = ConcurrencyThrottleStrategy.PostThreadQueue)
+        public GraphExecutive(DirectedAcyclicGraph graph, ConcurrencyThrottle throttle = null)
         {
             _graph = graph;
-            _throttle = new ConcurrencyThrottleStrategyFactory(throttle ?? new NullConcurrencyThrottle()).Build(concurrencyThrottleStrategy);
+            _throttle = throttle ?? new NullConcurrencyThrottle();
         }
 
         /// <summary>
@@ -53,13 +52,11 @@ namespace MPM.PDAG
         /// </summary>
         public void ExecuteAndWait()
         {
-            var resetEvent = new ManualResetEventSlim();
-
-            OnGraphExecutionFinished += (sender, ergs) => resetEvent.Set();
-
-            Execute();
-
-            resetEvent.Wait();
+            lock (_scheduleLock)
+            {
+                Execute();
+                Monitor.Wait(_scheduleLock);
+            }
         }
 
         /// <summary>
@@ -67,9 +64,10 @@ namespace MPM.PDAG
         /// </summary>
         public void Execute()
         {
-            lock (_executionLock)
+            lock (_scheduleLock)
             {
                 _verticesComplete = new List<Vertex>();
+                _verticesScheduled = new List<Vertex>();
                 VerticesFailed = new Dictionary<Vertex, Exception>();
                 _verticesProcessed = 0;
                 _allVerticesCount = _graph.AllVertices.Count();
@@ -80,12 +78,12 @@ namespace MPM.PDAG
 
         private void Execute(Vertex vertex)
         {
-            _throttle.EnterPreThreadQueue();
+            _verticesScheduled.Add(vertex);
             ThreadPool.QueueUserWorkItem(state =>
             {
                 try
                 {
-                    _throttle.EnterPostThreadQueue();
+                    _throttle.Enter();
                     vertex.Execute();
                    
                     ProcessPostVertexExecutionSuccess(vertex);
@@ -103,22 +101,30 @@ namespace MPM.PDAG
 
         private void ProcessPostVertexExecutionSuccess(Vertex vertex)
         {
-            IEnumerable<Vertex> next;
             lock (_scheduleLock)
             {
                 _verticesComplete.Add(vertex);
                 _verticesProcessed++;
 
-                next =
-                    vertex.Dependents.Where(
-                        d => d.Dependencies.All(n => _verticesComplete.Contains(n) && !_verticesComplete.Contains(d)));
-                    
-                if (_verticesProcessed == _allVerticesCount && OnGraphExecutionFinished != null)
-                    OnGraphExecutionFinished(this, EventArgs.Empty);
-            }
+                var next = vertex.Dependents.Where(
+                    d => d.Dependencies.All(n => _verticesComplete.Contains(n) && !_verticesScheduled.Contains(d)));
 
-            foreach (var v in next)
-                Execute(v);
+                if (_verticesProcessed == _allVerticesCount)
+                {
+                    if (next.Any())
+                        throw new Exception("all graph nodes processed but executive trying to execute more");
+
+                    Monitor.Pulse(_scheduleLock);
+
+                    if (OnGraphExecutionFinished != null)
+                        OnGraphExecutionFinished(this, EventArgs.Empty);
+
+                    return;
+                }
+
+                foreach (var v in next)
+                    Execute(v);
+            }
         }
 
         private void ProcessPostVertexExecutionFailure(Vertex vertex, Exception exception)

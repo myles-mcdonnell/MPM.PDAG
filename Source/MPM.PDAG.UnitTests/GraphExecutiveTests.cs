@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
@@ -9,7 +10,7 @@ namespace MPM.PDAG.UnitTests
     public class GraphExecutiveTests
     {
         [Test]
-        public void SimpleGraphExecuteSequentially()
+        public void SimpleGraphExecute_NoConcurrency()
         {
             var stack = new Stack<int>();
 
@@ -20,25 +21,7 @@ namespace MPM.PDAG.UnitTests
             node2.AddDependencies(node1);
             node1.AddDependencies(node0);
 
-            new SequentialGraphExecutive(new DirectedAcyclicGraph(node0, node1, node2)).Execute();
-
-            for (var i = 3; i > 0; i--)
-                Assert.AreEqual(i, stack.Pop());
-        }
-
-        [Test]
-        public void SimpleGraphExecuteConcurrently()
-        {
-            var stack = new Stack<int>();
-
-            var node0 = new Vertex(() => stack.Push(1));
-            var node1 = new Vertex(() => stack.Push(2));
-            var node2 = new Vertex(() => stack.Push(3));
-
-            node2.AddDependencies(node1);
-            node1.AddDependencies(node0);
-
-            var executive = new ConcurrentGraphExecutive(new DirectedAcyclicGraph(node0, node1, node2));
+            var executive = new GraphExecutive(new DirectedAcyclicGraph(node0, node1, node2));
             
             var resetEvent = new ManualResetEventSlim();
 
@@ -50,6 +33,41 @@ namespace MPM.PDAG.UnitTests
 
             for (var i = 3; i > 0; i--)
                 Assert.AreEqual(i, stack.Pop());
+        }
+
+        [Test]
+        public void SimpleGraphExecute_WithConcurrency_NoThrottle()
+        {
+            //TODO: Sledgehammer, should be improved
+            for (int ii = 0; ii < 1000; ii++)
+            {
+                var stack = new ConcurrentStack<int>();
+
+                var node0 = new Vertex(() => stack.Push(1));
+                var node1 = new Vertex(() => stack.Push(2));
+                var node2 = new Vertex(() => stack.Push(2));
+                var node3 = new Vertex(() => stack.Push(2));
+                var node4 = new Vertex(() => stack.Push(3));
+
+                node3.AddDependencies(node0);
+                node2.AddDependencies(node0);
+                node1.AddDependencies(node0);
+
+                node4.AddDependencies(node1, node2, node3);
+
+                var executive = new GraphExecutive(new DirectedAcyclicGraph(node0, node1, node2, node3, node4));
+
+                executive.ExecuteAndWait();
+
+                Assert.IsTrue(executive.VerticesFailed.Count==0);
+
+                var vals = stack.ToArray();
+
+                var expected = new[] {3, 2, 2, 2, 1};
+
+                for (var i = 0; i < expected.Length; i++)
+                    Assert.AreEqual(expected[i], vals[i]);
+            }
         }
 
         public class MaxCount
@@ -78,18 +96,7 @@ namespace MPM.PDAG.UnitTests
         }
 
         [Test]
-        public void ConcurrencyThrottle_PostThreadSchedule()
-        {
-            ConcurrencyThrottle(ConcurrencyThrottleStrategy.PostThreadQueue);
-        }
-
-        [Test]
-        public void ConcurrencyThrottle_PreThreadSchedule()
-        {
-            ConcurrencyThrottle(ConcurrencyThrottleStrategy.PreThreadQueue);
-        }
-
-        private static void ConcurrencyThrottle(ConcurrencyThrottleStrategy strategy)
+        public void ConcurrencyThrottle()
         {
             var maxCount = new MaxCount();
 
@@ -145,7 +152,7 @@ namespace MPM.PDAG.UnitTests
             node15.AddDependencies(node0);
             node16.AddDependencies(node0);
 
-            var executive = new ConcurrentGraphExecutive(new DirectedAcyclicGraph(node0), new ConcurrencyThrottle(2), strategy);
+            var executive = new GraphExecutive(new DirectedAcyclicGraph(node0), new ConcurrencyThrottle(2));
 
             var resetEvent = new ManualResetEventSlim();
 

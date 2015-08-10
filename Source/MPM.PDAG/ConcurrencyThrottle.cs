@@ -20,7 +20,7 @@ using System.Threading;
 namespace MPM.PDAG
 {
     /// <summary>
-    /// Used to limit the number of vertices executed concurrently by <see cref="ConcurrentGraphExecutive"/>. Defaults to number of processors on host.
+    /// Used to limit the number of vertices executed concurrently by <see cref="GraphExecutive"/>. Defaults to number of processors on host.
     /// </summary>
     public class ConcurrencyThrottle 
     {

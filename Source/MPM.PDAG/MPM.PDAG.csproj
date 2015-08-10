@@ -38,13 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConcurrencyThrottle.cs" />
-    <Compile Include="ConcurrencyThrottleStrategy.cs" />
-    <Compile Include="ConcurrencyThrottleStrategyFactory.cs" />
-    <Compile Include="ConcurrentGraphExecutive.cs" />
+    <Compile Include="GraphExecutive.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="IConcurrencyThottleStrategy.cs" />
-    <Compile Include="SequentialGraphExecutive.cs" />
-    <Compile Include="IGraphExecutive.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Exceptions\CircularDependencyException.cs" />
     <Compile Include="ThottlePostThreadQueueStrategy.cs" />

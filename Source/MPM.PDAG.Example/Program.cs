@@ -25,7 +25,7 @@ namespace MPM.PDAG.Example
             var graph = new DirectedAcyclicGraph(nodeA, nodeB, nodeC, nodeD, nodeE, nodeF);
 
             //Create a graph executive
-            var graphExecutive = new ConcurrentGraphExecutive(graph, new ConcurrencyThrottle(8), ConcurrencyThrottleStrategy.PreThreadQueue);
+            var graphExecutive = new GraphExecutive(graph, new ConcurrencyThrottle(8));
 
             graphExecutive.ExecuteAndWait();
             
