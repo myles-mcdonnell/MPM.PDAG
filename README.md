@@ -1,9 +1,9 @@
 # MPM.PDAG
-A component library for building directed acyclic graphs and executing the vertices concurrently.
+A .NET component library for the concurrent execution of vertices in a directed acyclic graph.  A JVM version is also available here: [https://github.com/myles-mcdonnell/PDAG_JAVA](https://github.com/myles-mcdonnell/PDAG_JAVA)
 
 Imagine a graph like so..
 
-<img src="https://db.tt/0yiN7MgI"/>
+<img src="https://dl.dropboxusercontent.com/u/30149716/github_content/PDAG%20README.png"/>
 
 ..we can reason that A and B can be executed concurrently. C can be executed when A & B are complete, F can be executed when only B is complete and D & E can be excuted concurrently when C is complete. F may be executed concurrently with and/or A | C | D | E.
 
@@ -14,7 +14,7 @@ be provided when executing a graph.  What action is performed when a vertex is e
 Although this code has been kicking around in my tool box for a few years only the simple use cases are complete.  There is work to be done around graph execution cancellation and a few other features, PR's are more than welcome.
 
 <pre>
-//Create six node that each do nothing for at least 1 second
+//Create six nodes that each do nothing for at least 1 second
 var nodeA = new Vertex(() => Thread.Sleep(1000));
 var nodeB = new Vertex(() => Thread.Sleep(1000));
 var nodeC = new Vertex(() => Thread.Sleep(1000));
@@ -30,7 +30,7 @@ nodeF.AddDependencies(nodeB);
 var graph = new DirectedAcyclicGraph(nodeA, nodeB, nodeC, nodeD, nodeE, nodeF);
 
 //Create a graph executive
-var graphExecutive = new ConcurrentGraphExecutive(graph, new ConcurrencyThrottle(8), ConcurrencyThrottleStrategy.PreThreadQueue);
+var graphExecutive = new ConcurrentGraphExecutive(graph);
 
 graphExecutive.ExecuteAndWait();
             

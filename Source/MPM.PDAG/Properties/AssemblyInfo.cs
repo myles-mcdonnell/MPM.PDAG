@@ -27,8 +27,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("MPM.PDAG")]
-[assembly:
-    AssemblyDescription("A component library for building directed acyclic graphs and executing the vertices concurrently")]
+[assembly: AssemblyDescription("A component library for building directed acyclic graphs and executing the vertices concurrently")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MPM")]
 [assembly: AssemblyProduct("PDAG")]
@@ -57,5 +56,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("2.0.0.*")]
+[assembly: AssemblyVersion("3.0.0.0")]
 //[assembly: InternalsVisibleTo("MPM.PDAG.UnitTests", AllInternalsVisible = true)]

@@ -70,6 +70,37 @@ namespace MPM.PDAG.UnitTests
             }
         }
 
+        [Test]
+        public void SimpleGraphExecute_WithConcurrency_NoThrottle_WithException()
+        {
+            var stack = new ConcurrentStack<int>();
+
+            var node0 = new Vertex(() => stack.Push(1));
+            var node1 = new Vertex(() => stack.Push(2));
+            var node2 = new Vertex(() => { throw new Exception(); });
+            var node3 = new Vertex(() => stack.Push(2));
+            var node4 = new Vertex(() => stack.Push(3));
+
+            node3.AddDependencies(node0);
+            node2.AddDependencies(node0);
+            node1.AddDependencies(node0);
+
+            node4.AddDependencies(node1, node2, node3);
+
+            var executive = new GraphExecutive(new DirectedAcyclicGraph(node0, node1, node2, node3, node4));
+
+            executive.ExecuteAndWait();
+
+            Assert.IsTrue(executive.VerticesFailed.Count == 2);
+
+            var vals = stack.ToArray();
+
+            var expected = new[] { 2, 2, 1 };
+
+            for (var i = 0; i < expected.Length; i++)
+                Assert.AreEqual(expected[i], vals[i]);
+        }
+
         public class MaxCount
         {
             private readonly object _lock = new object();

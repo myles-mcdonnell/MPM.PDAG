@@ -141,6 +141,13 @@ namespace MPM.PDAG
                     VerticesFailed.Add(dependent, new Exception("Dependency Failed"));
                     _verticesProcessed++;
                 }
+
+                if (_verticesProcessed != _allVerticesCount) return;
+                
+                Monitor.Pulse(_scheduleLock);
+
+                if (OnGraphExecutionFinished != null)
+                    OnGraphExecutionFinished(this, EventArgs.Empty);
             }
         }
     }
