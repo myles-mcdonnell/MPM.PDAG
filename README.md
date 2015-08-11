@@ -1,6 +1,8 @@
 # MPM.PDAG
 A .NET component library for the concurrent execution of vertices in a directed acyclic graph.  A JVM version is also available here: [https://github.com/myles-mcdonnell/PDAG_JAVA](https://github.com/myles-mcdonnell/PDAG_JAVA)
 
+Also available via NuGet: [https://www.nuget.org/packages/MPM.PDAG/](https://www.nuget.org/packages/MPM.PDAG/).
+
 Imagine a graph like so..
 
 <img src="https://dl.dropboxusercontent.com/u/30149716/github_content/PDAG%20README.png"/>
